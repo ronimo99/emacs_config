@@ -1,0 +1,529 @@
+
+#+Author: Robert Nieto
+#+Title: Robert's Emacs Configuration
+#+Date: [2020-08-23 Sun]
+* utilities
+** wich-key
+ #+BEGIN_SRC emacs-lisp
+   (use-package which-key
+     :ensure t
+     :init
+     (which-key-mode))
+ #+END_SRC 
+** projectile
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :ensure t
+    :config
+    (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+    (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+    (projectile-mode +1))
+#+END_SRC
+** magit
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :ensure t)
+#+END_SRC
+** Ibuffer buffers "C-x C-b" (not so useful after all)
+#+BEGIN_SRC emacs-lisp
+  ;;(global-set-key (kbd "C-x C-b") 'ibuffer)
+#+END_SRC
+** Gif support infinite loop
+ #+BEGIN_SRC emacs-lisp
+   (setq image-animate-loop t)
+ #+END_SRC 
+** hungry-delete (multiple space autodeletion)
+#+BEGIN_SRC emacs-lisp
+  (use-package hungry-delete
+    :ensure t
+    :config (global-hungry-delete-mode))
+#+END_SRC
+** Kill all buffers
+#+BEGIN_SRC emacs-lisp
+  (defun kill-all-buffers ()
+    (interactive)
+    (mapc 'kill-buffer (buffer-list)))
+  (global-set-key (kbd "C-M-s-k") 'kill-all-buffers) ;;shit keybind, gotta find some other
+#+END_SRC
+* Screen & FX
+** Line wrap
+#+begin_src emacs-lisp
+  (global-visual-line-mode 1)
+#+end_src
+** Disabling themes before a theme change
+#+BEGIN_SRC emacs-lisp
+  ;;(defadvice load-theme (before theme-dont-propagate activate) "Disable theme before loading new one." (mapc #'disable-theme custom-enabled-themes))
+#+END_SRC
+** beacon
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package beacon
+  ;; defer t
+  ;; :ensure t
+  ;;   :init
+  ;;   (beacon-mode 1))
+#+END_SRC
+** Line highligting
+#+BEGIN_SRC emacs-lisp
+  (when window-system (global-hl-line-mode t))
+  (when window-system (global-prettify-symbols-mode t))
+#+END_SRC
+** rainbow-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-mode
+    :ensure t
+    :init (add-hook 'prog-mode-hook 'rainbow-mode))
+#+END_SRC
+** Pretty symbols
+#+begin_src emacs-lisp
+  ;; (when window-system
+  ;;   (use-package pretty-mode
+  ;;     :ensure t
+  ;; defer t
+  ;;     :config
+  ;;     (global-pretty-mode t)))
+#+end_src
+** powerline
+#+begin_src emacs-lisp
+  ;; (use-package powerline
+  ;;     :ensure t
+  ;; :defer t
+  ;;     :config
+  ;;     (powerline-vim-theme))
+#+end_src
+** diminish
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package diminish
+  ;;   :ensure t
+  ;;   :init
+  ;;   (diminish 'hungry-delete-mode)
+  ;;   (diminish 'ivy-mode)
+  ;;   (diminish 'projectile-mode)
+  ;;   (diminish 'beacon-mode)
+  ;;   (diminish 'which-key-mode)
+  ;;   (diminish 'rainbow-mode)
+  ;;   (diminish 'page-break-lines-mode)
+  ;;   (diminish 'eldoc-mode))
+#+END_SRC
+** mood-line (better diminish)
+#+begin_src emacs-lisp
+  (use-package mood-line
+    :ensure t
+    :init
+    (mood-line-mode))
+#+end_src
+** indent guides
+#+begin_src emacs-lisp
+  ;; (use-package highlight-indent-guides
+  ;; defer t
+  ;;     :ensure t
+  ;;     :init (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+#+end_src
+** Line numbers
+#+begin_src emacs-lisp
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+#+end_src
+* Emacs completion
+** ivy
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy
+    :defer t
+    :ensure t
+    :init
+    (ivy-mode 1)
+    :config
+    (setq ivy-use-virtual-buffers t)
+    (setq enable-recursive-minibuffers t)
+    (setq ivy-use-virtual-buffers t)
+    (setq ivy-count-format "(%d/%d) "))
+#+END_SRC
+** counsel
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel
+    :defer t
+    :ensure t)
+#+END_SRC
+* Searching tool
+** swiper
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+  :defer t
+  :ensure t
+  :bind ("C-s" . swiper))
+#+END_SRC
+* Org mode
+** org-bullets
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package org-bullets
+  ;; defer t
+  ;; :ensure t
+  ;;   :config
+  ;;   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+#+END_SRC
+** org-superstar (a better org-bullets)
+#+begin_src emacs-lisp
+  (use-package org-superstar
+    :ensure t
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1))))
+#+end_src
+** Org Indents
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook 'org-indent-mode)
+#+end_src
+* Icons
+** All the icons
+#+BEGIN_SRC emacs-lisp
+  (use-package all-the-icons
+    :ensure t)
+#+END_SRC 
+*** Install the fonts automatically
+ #+BEGIN_SRC emacs-lisp
+   (unless (member "all-the-icons" (font-family-list))
+     (all-the-icons-install-fonts t))
+ #+END_SRC
+* Terminal
+** Setting default shell to bash
+#+BEGIN_SRC emacs-lisp
+  (defvar my-term-shell "/bin/bash")
+  (defadvice ansi-term (before force-bash)
+    (interactive (list my-term-shell)))
+  (ad-activate 'ansi-term)
+#+END_SRC 
+** Alias yes->y no->n:
+#+BEGIN_SRC emacs-lisp
+  (defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+** keybinding terminal <Super+RET>:
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "<M-return>") 'ansi-term)
+#+END_SRC
+* Dashboard
+** dashboard
+#+BEGIN_SRC emacs-lisp
+  (use-package dashboard
+    :config
+    (dashboard-setup-startup-hook)
+    (setq dashboard-banner-logo-title "Ah shit, here we go again.") ;;Set the title
+    (setq dashboard-startup-banner 'official) ;;Set the banner
+    (setq dashboard-center-content t)
+    (setq dashboard-show-shortcuts nil) ;;To disable shortcut "jump" indicators for each section, set
+    (setq dashboard-items '((recents  . 10) ;;Dashboard widgets
+                            (projects . 10)))
+    (setq dashboard-set-heading-icons t) ;;Dashboard icons
+    (setq dashboard-set-file-icons t)
+    (setq dashboard-modify-heading-icons '((recents . "file-text")
+                                           (bookmarks . "book")))
+    (setq dashboard-set-footer nil) ;;Random footer message gone
+    (setq dashboard-set-navigator t) ;;Dashboard navigator
+    :ensure t)
+#+END_SRC 
+* Movement
+** avy (letter searching "M-s")
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :ensure t
+    :bind
+    ("M-s" . avy-goto-char))
+#+END_SRC
+** evil-mode
+#+begin_src emacs-lisp
+  ;; (use-package evil
+  ;; defer t
+  ;;   :ensure t
+  ;;   :config
+  ;;   (evil-mode 1))
+#+end_src
+* Tabs
+** centaur-tabs
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package centaur-tabs
+  ;; :defer t
+  ;;   :ensure t
+  ;;   :demand
+  ;;   :config
+  ;;   (centaur-tabs-mode t)
+  ;;   (setq centaur-tabs-style "bar")
+  ;;   (setq centaur-tabs-height 32)
+  ;;   (setq centaur-tabs-set-icons t)
+  ;;   (setq centaur-tabs-set-bar 'left)
+  ;;   (centaur-tabs-change-fonts "Source Code Pro Regular" 110)
+  ;;   (setq centaur-tabs-set-modified-marker t)
+  ;;   (centaur-tabs-headline-match)
+  ;;   :bind
+  ;;   ("C-<prior>" . centaur-tabs-backward)
+  ;;   ("C-<next>" . centaur-tabs-forward))
+#+END_SRC
+* Folder tree
+** neotree
+#+begin_src emacs-lisp
+  (use-package neotree
+    :ensure t
+    :defer t
+    :config
+    :bind
+    (:map global-map
+          ([f8] . 'neotree-toggle)))
+#+end_src
+** Treemacs.
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package treemacs
+  ;;   :ensure t
+  ;;   :defer t
+  ;;   :config
+  ;;   (progn
+  ;;     (setq treemacs-file-follow-delay             0.0            
+  ;;           treemacs-follow-after-init             t            
+  ;;           treemacs-indentation                   2
+  ;;           treemacs-indentation-string            " "
+  ;;           treemacs-is-never-other-window         nil
+  ;;           treemacs-max-git-entries               5000
+  ;;           treemacs-missing-project-action        'ask            
+  ;;           treemacs-no-png-images                 nil
+  ;;           treemacs-no-delete-other-windows       t
+  ;;           treemacs-project-follow-cleanup        nil
+  ;;           treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+  ;;           treemacs-position                      'left
+  ;;           treemacs-recenter-distance             0.1
+  ;;           treemacs-recenter-after-project-jump   'always
+  ;;           treemacs-recenter-after-project-expand 'on-distance
+  ;;           treemacs-show-cursor                   nil
+  ;;           treemacs-show-hidden-files             t
+  ;;           treemacs-silent-filewatch              nil
+  ;;           treemacs-silent-refresh                nil
+  ;;           treemacs-sorting                       'alphabetic-asc
+  ;;           treemacs-space-between-root-nodes      t
+  ;;           treemacs-tag-follow-cleanup            t
+  ;;           treemacs-tag-follow-delay              1
+  ;;           treemacs-user-mode-line-format         nil
+  ;;           treemacs-user-header-line-format       nil
+  ;;           treemacs-width                         35
+  ;;           treemacs-workspace-switch-cleanup      nil
+  ;;           treemacs-display-current-project-exclusively t)
+
+  ;;     ;; The default width and height of the icons is 22 pixels. If you are
+  ;;     ;; using a Hi-DPI display, uncomment this to double the icon size.
+  ;;     ;;(treemacs-resize-icons 44)
+
+  ;;     (treemacs-follow-mode t)
+  ;;     (treemacs-filewatch-mode t)
+  ;;     (treemacs-fringe-indicator-mode t)
+  ;;     (pcase (cons (not (null (executable-find "git")))
+  ;;                  (not (null treemacs-python-executable)))
+  ;;       (`(t . t)
+  ;;        (treemacs-git-mode 'deferred))
+  ;;       (`(t . _)
+  ;;        (treemacs-git-mode 'simple))))
+  ;;   :bind
+  ;;   (:map global-map
+  ;;         ("C-<f8>"    . treemacs-select-window)
+  ;;         ("C-x t 1"   . treemacs-delete-other-windows)
+  ;;         ([f8]        . treemacs)
+  ;;         ("C-x t B"   . treemacs-bookmark)
+  ;;         ("C-x t C-t" . treemacs-find-file)
+  ;;         ("C-x t M-t" . treemacs-find-tag)))
+#+END_SRC
+** treemacs-magit
+ #+BEGIN_SRC emacs-lisp
+   ;; (use-package treemacs-magit
+   ;;   :after treemacs magit
+   ;;   :defer t
+   ;;   :ensure t)
+ #+END_SRC
+** treemacs-icons-dired
+ #+BEGIN_SRC emacs-lisp
+   ;; (use-package treemacs-icons-dired
+   ;;   :after treemacs dired
+   ;;   :defer t
+   ;;   :ensure t
+   ;;   :config (treemacs-icons-dired-mode))
+ #+END_SRC
+** treemacs-projectile
+ #+BEGIN_SRC emacs-lisp
+   ;; (use-package treemacs-projectile
+   ;;   :after treemacs projectile
+   ;;   :defer t
+   ;;   :ensure t)
+ #+END_SRC
+* System monitor
+** symon
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package symon
+  ;;   :ensure t
+  ;;   :config
+  ;;   (setq symon-sparkline-type 'boxed )
+  ;;   :init (symon-mode))
+#+END_SRC
+* Coding completion & language server protocol
+** lsp
++ Language server protocol. You still need to use clang to use c/c++ and jedi to use python and company for the autocompletions with lsp.
+#+BEGIN_SRC emacs-lisp
+  (setq lsp-keymap-prefix "s-l")
+
+  (use-package lsp-mode
+    :ensure t
+    :hook ((clang-mode . lsp)
+           (c-mode . lsp)
+           (c++-mode . lsp)
+           (cc-mode . lsp)
+           (python-mode . lsp)
+           (lsp-mode . lsp-enable-which-key-integration))
+    :commands lsp)
+
+  (use-package lsp-ivy
+    :ensure t
+    :commands lsp-ivy-workspace-symbol)
+
+  (use-package lsp-jedi
+    :ensure t
+    :config
+    (with-eval-after-load "lsp-mode"
+      (with-eval-after-load "python-mode"
+        (add-to-list 'lsp-disabled-clients 'pyls)
+        (add-to-list 'lsp-enabled-clients 'jedi))))
+#+END_SRC
+** company
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :ensure t
+    :hook
+    (add-hook 'after-init-hook 'global-company-mode)
+    :config
+    (setq company-minimum-prefix-length 1)
+    (setq company-idle-delay 0.0)
+    (setq company-dabbrev-downcase 0))
+  ;;Keyboard shortcuts to C-n & C-p for the menu navigation:
+  (with-eval-after-load 'company
+    (define-key company-active-map (kbd "M-n") nil)
+    (define-key company-active-map (kbd "M-p") nil)
+    (define-key company-active-map (kbd "C-n") #'company-select-next)
+    (define-key company-active-map (kbd "C-p") #'company-select-previous))
+#+END_SRC
+** yasnippet
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :config (use-package yasnippet-snippets
+             :ensure t)
+    (yas-reload-all))
+  (add-hook 'clang-mode-hook 'yas-minor-mode-on)
+  (add-hook 'c++-mode-hook 'yas-minor-mode-on)
+  (add-hook 'c-mode-hook 'yas-minor-mode-on)
+  (add-hook 'cc-mode-hook 'yas-minor-mode-on)
+  (add-hook 'emacs-lisp-mode-hook 'yas-minor-mode-on)
+  (add-hook 'latex-mode-hook 'yas-minor-mode-on)
+  (add-hook 'python-mode-hook 'yas-minor-mode-on)
+#+end_src
+* Syntax checking / Formating
+** flycheck
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :init (global-flycheck-mode))
+  (add-hook 'after-init-hook #'global-flycheck-mode)
+#+end_src
+** format-all
+#+begin_src emacs-lisp
+  (use-package format-all
+    :ensure t)
+#+end_src
+* LATEX
+** No autogenerated headers
+#+begin_src emacs-lisp
+(with-eval-after-load 'ox-latex
+(add-to-list 'org-latex-classes
+             '("org-plain-latex"
+               "\\documentclass{article}
+           [NO-DEFAULT-PACKAGES]
+           [PACKAGES]
+           [EXTRA]"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+#+end_src
+** Code highlights
+#+begin_src emacs-lisp
+(setq org-latex-listings 't)
+#+end_src
+* Anon's configuration help
+[[https://www.youtube.com/channel/UCDEtZ7AKmwS0_GNJog01D2g/videos][Uncle Dave's Videos]] The most important part of this section.
+** Conversation
+Use-package is useful to let all configurations related to a package in a single place and in a nice standard format.You can use :hook to add hooks, :bind to add keybindings, :config to set variables of a package, :defer to defer the loading so that Emacs starts faster, :mode to turn on some mode based on the file extension, :after and :require to say that the package should only load after some other dependency has been loaded etc.
+>>77116191 (You)
+>i dont get the config.org part, so the config org makes you a .emacs/init.el config file or the config.org is the config file?
+Not them but at the end of my init.el which only ensures straight and use-package are installed, I have
+(defvar literal-config-file (expand-file-name "config.org" user-emacs-directory)) (when (file-readable-p literal-config-file) (org-babel-load-file literal-config-file))
+Which loads my config.org.
+>and why an org file precisely?
+Because it lets me split the elisp into collapsible headings with some text that explains the more complex parts for me later. In my experience its much easier to have a ~1000 line config.org instead of ~800 line init.el or many smaller files that you load.
+
+>>77116191 (You)
+The config.org file uses org-babel to export the emacs-lisp blocks to the init.el. This keeps things more organized.
+
+>>77115980 (You)
+>so i can have the config file lying around anywhere
+I don't understand what you mean by this exactly. You have to put a little code snippet in your init.el (after you set package repositories) to install use-package if it's not installed at startup, then you can add use-package declarations freely to the init, replacing your (require)s and other options.
+This checks if use-package is installed, and if not, installs it.
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+>>77115929 (You)
+>feels like learning a new language
+thats exactly what elisp is
+>will save this for some time
+rather save this
+C-h f use-package RET
+typing that will give you the documentation of use-package inside of emacs, which describe all the ":" things you can add to it.
+>the fucking rabbit hole i'm getting into man
+the beauty is you choose how far you want to go, based on what you need.
+I myself would never add that use-package yasnippet because I know the options and I dont install 50 packages a week.
+
+>>77116191 (You)
+You can tell your init.el to load a config.org file containing all your more complex configurations, and only keep the basics, like MELPA setup in the init.el. You could also load a .el file, but that would be missing the point: having all your configs nicely organized in a very readable org file. You organize it in sections, and have collapsible headings to make it easier to navigate. If you need help, I'd say watch Uncle Dave's tutorials on use-package and writing a config in org-mode. He gives a quick rundown of how to get this sort of setup up and running (it's not hard at all), and you get to see it in action.
+** Anon's web dev packages
+*** emmet-mode (snippets and shit, idk):
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package emmet-mode
+  ;;   :straight t
+  ;;   :hook ((web-mode . (lambda () (emmet-mode)))
+  ;;          (css-mode . (lambda () (emmet-mode)))))
+#+END_SRC 
+*** web-mode (major-mode for editing web templates):
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package web-mode
+  ;;   :straight t
+  ;;   :mode (("\\.html\\'"    . web-mode)))
+#+END_SRC
+*** rainbow-mode (showing color names color in code):
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package rainbow-mode
+  ;;   :straight t
+  ;;   :hook (org-mode . (lambda () (rainbow-mode)))
+  ;;   :mode (("\\.html\\'"    . rainbow-mode)
+  ;;          ("\\.css\\'"    . rainbow-mode)))
+
+ #+END_SRC
+*** impatient-mode (real time web visualization):
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package impatient-mode
+  ;;   :straight t
+  ;;   :commands impatient-mode)
+#+END_SRC
+*** simple-httpd (simple web server for editing with impatient-mode):
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package simple-httpd
+  ;;   :straight t
+  ;;   :commands httpd-start)
+#+END_SRC
+*** org-static-blog (to create a statick blog with org mode):
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package org-static-blog
+  ;;   :straight t
+  ;;   :commands (org-static-blog-create-new-post
+  ;;              org-static-blog-publish
+  ;;              org-static-blog-publish-file)
+  ;;   :config (load-file "~/.emacs.d/blog.
+#+END_SRC
+
