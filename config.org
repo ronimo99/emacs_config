@@ -1,7 +1,7 @@
 
 #+Author: Robert Nieto
 #+Title: Robert's Emacs Configuration
-#+Date: [2020-08-23 Sun]
+#+Date: [2022-02-12 Sat]
 * utilities
 ** wich-key
  #+BEGIN_SRC emacs-lisp
